@@ -3,7 +3,7 @@ import pygame, sys
 from pygame.locals import *
 
 pygame.init()
-print('hello')
+#print('hello')
 FPS = 30 # frames per second setting
 clock = pygame.time.Clock()
 
@@ -47,21 +47,21 @@ while not done:
     for event in pygame.event.get():
         if event.type == QUIT:
             done = True
-            print('bye-bye')
+#            print('bye-bye')
             pygame.quit() #delete
             sys.exit() #delete
         elif event.type == pygame.KEYDOWN:
             if event.key == K_d:
                 keys[0] = True
                 pos += 10
-                print("step")
+#                print("step")
             elif event.key == K_w:
                 keys[1] = True
                 phi += math.pi/12
-                print("head up")
+#                print("head up")
             elif event.key == K_s:
                 keys[2] = True
-                print('fire!')                           
+#                print('fire!')
     screen.fill(WHITE)    
     pygame.draw.line(screen, BLACK, (0, y), (screen_width, y), 4)
     tank = pygame.Rect(pos, y-30, 80, 30)
