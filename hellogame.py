@@ -22,27 +22,40 @@ BLUE = (0, 0, 255)
 
 y = screen_height * 3/4
 l = 50
-phi = math.pi/9
+# phi = math.pi/9
 pos = 100
 
 
 class Tank(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.rect = pygame.Rect(pos, y-30, 80, 30)
-        self.a0 = self.rect.centerx
-        self.b0 = self.rect.top
-        self.a1 = self.rect.centerx + l*math.cos(phi)
-        self.b1 = self.rect.top - l*math.sin(phi)
-        self.bx, self.by = int(self.a1), int(self.b1)
+        self.body = pygame.Rect(pos, y-30, 80, 30)
+        self.phi = math.pi/9
+        self.DELTA_PHI = math.pi/12
+
+    def rotate_barrel(self, direction='ccw'):
+        print self.phi
+        if (self.phi >= 0 and direction == 'ccw') or (self.phi <= math.pi and direction == 'cw'):
+        # if 0 <= self.phi <= math.pi:
+            self.phi += self.DELTA_PHI if direction == 'ccw' else -self.DELTA_PHI
+            if self.phi < 0:
+                self.phi = 0
+            if self.phi > math.pi:
+                self.phi = math.pi
 
     def display(self):
-        pygame.draw.rect(screen, RED, self.rect)
-        pygame.draw.line(screen, RED, (self.a0, self.b0), (self.a1, self.b1), 10)
+        self.a0 = self.body.centerx
+        self.b0 = self.body.top
+        self.a1 = self.body.centerx + l*math.cos(self.phi)
+        self.b1 = self.body.top - l*math.sin(self.phi)
+        self.bx, self.by = int(self.a1), int(self.b1)
 
-    def update(self):
-        # pos += 10
-        self.rect.move_ip(10, 0)
+        pygame.draw.rect(screen, GREEN, self.body)
+        pygame.draw.line(screen, GREEN, (self.a0, self.b0), (self.a1, self.b1), 12)
+
+    def update(self, direction='right'):
+        self.body = self.body.move(10 if direction == 'right' else -10, 0)
+
 
 
 class Particle():
@@ -87,16 +100,24 @@ while not done:
             sys.exit()   # delete?
         elif event.type == pygame.KEYDOWN:
             if event.key == K_d:
-                    #tank.move_right()
                     tank.update()
                     tank.display()
                     print("move_right")
 
-            #elif event.key == K_w:
-            #    #keys[1] = True
-            #    phi += math.pi/12
-#           #     print("head up")
-            if event.key == K_s:
+            elif event.key == K_a:
+                    tank.update(direction='left')
+                    tank.display()
+                    print("move_left")
+
+            elif event.key == K_w:
+               tank.rotate_barrel(direction='ccw')
+               print("head up")
+
+            elif event.key == K_x:
+               tank.rotate_barrel(direction='cw')
+               print("head down")
+
+            elif event.key == K_s:
                 bul = Particle(tank.a1, tank.b1)
                 bullist.append(bul)
 #                print('fire!')
