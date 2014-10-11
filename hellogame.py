@@ -27,6 +27,9 @@ pos = 100
 
 
 class Tank(pygame.sprite.Sprite):
+    '''
+    class for manipulating tanks
+    '''
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
         self.body = pygame.Rect(pos, y-30, 80, 30)
@@ -58,27 +61,36 @@ class Tank(pygame.sprite.Sprite):
 
 
 
-class Particle():
+class Particle(pygame.sprite.Sprite):
     def __init__(self, x, y):
-        self.x = x
-        self.y = y
+        pygame.sprite.Sprite.__init__(self)
+        self.x = int(x)
+        self.y = int(y)
         self.size = 4
 
     def display(self):
-        pygame.draw.circle(screen, BLACK, self.x, self.y, self.size)
+        print 'bullet', self.x
+        self.bullet = pygame.draw.circle(screen, BLACK, (self.x, self.y), self.size)
+        # self.bullet = bullet.get_rect()
 
-    def move(self):
-
-        #while self.x < screen_width and self.y < y:
-            self.x += 10
-            self.y -= 10
+    # def move(self):
+    #
+    #     #while self.x < screen_width and self.y < y:
+    #         self.x += 10
+    #         self.y -= 10
+    def update(self):
+        print 'bullet upd', self.x
+        self.bullet.x += 10
+        self.x += 10
+        self.display()
 
     def remove(self):
         pygame.draw.circle(screen, WHITE, self.x, self.y)
 
 done = False
 playtime = 0
-bullist = []
+# bullist = []
+bullist = pygame.sprite.Group()
 all_sprites_list = pygame.sprite.Group()
 
 tank = Tank()
@@ -119,8 +131,10 @@ while not done:
 
             elif event.key == K_s:
                 bul = Particle(tank.a1, tank.b1)
-                bullist.append(bul)
-#                print('fire!')
+                bullist.add(bul)
+                bul.display()
+    bullist.update()
+
 
     all_sprites_list.update()
 
@@ -128,7 +142,9 @@ while not done:
     #     bul.move()
     #     if bul.x > screen_width or bul.y < 0:
     #         bullist.remove(bul)
-
+    for b in bullist:
+        if b.x > screen_width or b.y < 0 or b.x < 0 or b.y > y:
+            bullist.remove(b)
 
 
     all_sprites_list.draw(screen)
