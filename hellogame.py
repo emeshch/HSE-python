@@ -19,70 +19,99 @@ RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 
-pos = 100
-y = screen_height *3/4
+
+y = screen_height * 3/4
 l = 50
 phi = math.pi/9
-keys = [False, False, False]
+pos = 100
+
+
+class Tank(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.rect = pygame.Rect(pos, y-30, 80, 30)
+        self.a0 = self.rect.centerx
+        self.b0 = self.rect.top
+        self.a1 = self.rect.centerx + l*math.cos(phi)
+        self.b1 = self.rect.top - l*math.sin(phi)
+        self.bx, self.by = int(self.a1), int(self.b1)
+
+    def display(self):
+        pygame.draw.rect(screen, RED, self.rect)
+        pygame.draw.line(screen, RED, (self.a0, self.b0), (self.a1, self.b1), 10)
+
+    def update(self):
+        # pos += 10
+        self.rect.move_ip(10, 0)
+
 
 class Particle():
-    def __init__(self, (x, y), size):
+    def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.size = size
+        self.size = 4
+
     def display(self):
-        pygame.draw.circle(screen, BLACK, (self.x, self.y), self.size)
+        pygame.draw.circle(screen, BLACK, self.x, self.y, self.size)
+
     def move(self):
-        self.x += 10
-        
+
+        #while self.x < screen_width and self.y < y:
+            self.x += 10
+            self.y -= 10
+
     def remove(self):
-        pygame.draw.circle(screen, WHITE, (self.x, self.y), self.size)
+        pygame.draw.circle(screen, WHITE, self.x, self.y)
 
 done = False
 playtime = 0
-#bx, by = 10, 10
+bullist = []
+all_sprites_list = pygame.sprite.Group()
+
+tank = Tank()
+
+
+
 while not done:
     milliseconds = clock.tick(FPS) # do not go faster than this framerate
     playtime += milliseconds / 1000.0
+
+    screen.fill(WHITE)
+    pygame.draw.line(screen, BLACK, (0, y), (screen_width, y), 4)
+    tank.display()
+
     for event in pygame.event.get():
         if event.type == QUIT:
             done = True
-#            print('bye-bye')
-            pygame.quit() #delete
-            sys.exit() #delete
+            pygame.quit()  # delete?
+            sys.exit()   # delete?
         elif event.type == pygame.KEYDOWN:
             if event.key == K_d:
-                keys[0] = True
-                pos += 10
-#                print("step")
-            elif event.key == K_w:
-                keys[1] = True
-                phi += math.pi/12
-#                print("head up")
-            elif event.key == K_s:
-                keys[2] = True
+                    #tank.move_right()
+                    tank.update()
+                    tank.display()
+                    print("move_right")
+
+            #elif event.key == K_w:
+            #    #keys[1] = True
+            #    phi += math.pi/12
+#           #     print("head up")
+            if event.key == K_s:
+                bul = Particle(tank.a1, tank.b1)
+                bullist.append(bul)
 #                print('fire!')
-    screen.fill(WHITE)    
-    pygame.draw.line(screen, BLACK, (0, y), (screen_width, y), 4)
-    tank = pygame.Rect(pos, y-30, 80, 30)
-    pygame.draw.rect(screen, RED, tank)
-    a0 = tank.centerx
-    b0 = tank.top
-    a1 = tank.centerx + l*math.cos(phi)
-    b1 = tank.top - l*math.sin(phi)
-    bx, by = int(a1), int(b1)
-    pygame.draw.line(screen, RED, (a0,b0), (a1,b1), 10)
-    
-    if keys[2] == True:
-        bul = Particle((bx,by), 5)
-        while bul.x < screen_width and bul.y < y:
-            bul.move()
-            bul.display()
-           # time.sleep(0.02)
-            
-            
-    pygame.display.flip()    
-    clock.tick(10)
 
-#pygame.display.update()
+    all_sprites_list.update()
 
+    # for bul in bullist:
+    #     bul.move()
+    #     if bul.x > screen_width or bul.y < 0:
+    #         bullist.remove(bul)
+
+
+
+    all_sprites_list.draw(screen)
+
+    pygame.display.flip()
+
+    clock.tick(60)
