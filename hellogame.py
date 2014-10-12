@@ -37,6 +37,7 @@ class Tank(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.body = pygame.Rect(pos, ground_level-30, 80, 30)
         self.tank_id = tank_id
+        self.score = 0
         if self.tank_id == 1:
             self.phi = phi1
             self.color = GREEN
@@ -184,18 +185,38 @@ while not done:
 
     bullist1.update()
     bullist2.update()
-
+    # print len(bullist2)
     all_sprites_list.update()
 
+    # collision_list = [i.bullet for i in bullist1] + [i.bullet for i in bullist2]
+    # index1 = tank1.whole_tank.collidelist(collision_list)
+    #
+    # if index1 > -1:
+    #     # print index1
+    #     if index1 > len(bullist1) - 1:
+    #         bullist2.remove(bullist2[index1 - len(bullist1)])
+    #     else:
+    #         bullist1.remove(bullist1[index1])
+
+
+
     for b in bullist1:
+        if b.bullet.colliderect(tank2.whole_tank):
+            bullist1.remove(b)
+            tank1.score += 1
+            continue
         if b.bullet.x > screen_width or b.bullet.y < 0 or b.bullet.x < 0 or b.bullet.y > ground_level:
             bullist1.remove(b)
 
     for b in bullist2:
+        if b.bullet.colliderect(tank1.whole_tank):
+            bullist2.remove(b)
+            tank2.score += 1
+            continue
         if b.bullet.x > screen_width or b.bullet.y < 0 or b.bullet.x < 0 or b.bullet.y > ground_level:
             bullist2.remove(b)
 
-
+    print "score: {} - {}".format(tank1.score, tank2.score)
     all_sprites_list.draw(screen)
 
     pygame.display.flip()
