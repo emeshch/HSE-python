@@ -4,6 +4,7 @@ from pygame.locals import *
 
 pygame.init()
 #print('hello')
+
 FPS = 30 # frames per second setting
 clock = pygame.time.Clock()
 
@@ -11,7 +12,7 @@ screen_width = 800
 screen_height = 600
 screen = pygame.display.set_mode([screen_width, screen_height])
 pygame.display.set_caption('Hello_World')
-
+font = pygame.font.Font(None, 36)
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -216,8 +217,14 @@ while not done:
         if b.bullet.x > screen_width or b.bullet.y < 0 or b.bullet.x < 0 or b.bullet.y > ground_level:
             bullist2.remove(b)
 
-    print "score: {} - {}".format(tank1.score, tank2.score)
+    # print "score: {} - {}".format(tank1.score, tank2.score)
     all_sprites_list.draw(screen)
+
+    text = font.render("score: {} - {}".format(tank1.score, tank2.score), 1, (10, 10, 10))
+    textpos = text.get_rect()
+    textpos.centerx = screen_width * 7/8
+    textpos.top = screen_height * 7/8
+    screen.blit(text, textpos)
 
     pygame.display.flip()
 
