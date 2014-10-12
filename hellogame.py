@@ -7,8 +7,8 @@ pygame.init()
 FPS = 30 # frames per second setting
 clock = pygame.time.Clock()
 
-screen_width = 400
-screen_height = 300
+screen_width = 800
+screen_height = 600
 screen = pygame.display.set_mode([screen_width, screen_height])
 pygame.display.set_caption('Hello_World')
 
@@ -39,8 +39,10 @@ class Tank(pygame.sprite.Sprite):
         self.tank_id = tank_id
         if self.tank_id == 1:
             self.phi = phi1
+            self.color = GREEN
         else:
             self.phi = phi2
+            self.color = BLUE
         # self.DELTA_PHI = math.pi/18
 
     def rotate_barrel(self, direction='ccw'):
@@ -60,43 +62,50 @@ class Tank(pygame.sprite.Sprite):
         self.b1 = self.body.top - barrel_length*math.sin(self.phi)
         self.bx, self.by = int(self.a1), int(self.b1)
 
-        pygame.draw.rect(screen, GREEN, self.body)
-        pygame.draw.line(screen, GREEN, (self.a0, self.b0), (self.a1, self.b1), 12)
+        pygame.draw.rect(screen, self.color, self.body)
+        barrel = pygame.draw.line(screen, self.color, (self.a0, self.b0), (self.a1, self.b1), 12)
+        self.whole_tank = self.body.union(barrel)
 
     def update(self, direction='right'):
-        self.body = self.body.move(10 if direction == 'right' else -10, 0)
-
-
+        print self.body.right
+        if direction == 'right':
+            if self.body.right + 10 <= screen_width:
+                self.body = self.body.move(10, 0)
+        else:
+            if self.body.left - 10 >= 0:
+                self.body = self.body.move(-10, 0)
 
 
 class Particle(pygame.sprite.Sprite):
-    def __init__(self, tank_id, x, y):
+    def __init__(self, tank_phi, x, y):
         pygame.sprite.Sprite.__init__(self)
-        self.tank_id = tank_id
-        self.x = int(x)
-        self.y = int(y)
+        self.phi = tank_phi
         self.size = 4
+        self.x = x
+        self.y = y
+        self.t = 0
 
     def display(self):
-        print 'bullet', self.x
-        self.bullet = pygame.draw.circle(screen, BLACK, (self.x, self.y), self.size)
-        # self.bullet = bullet.get_rect()
+        # print 'bullet', self.x
+        self.bullet = pygame.draw.circle(screen, BLACK, (int(self.x), int(self.y)), self.size)
 
     def update(self):
         # self.tank_id = tank_id
-        print self.tank_id, 'bullet upd', self.x
-
-        if self.tank_id == 1:
-            self.bullet.x += 10
-            self.x += 10
-        else:
-            self.bullet.x -= 10
-            self.x -= 10
+        # print 'bullet upd', self.x
+        self.t += 1
+        vel = 15
+        # if math.cos(self.phi) > 0:
+            # self.bullet.move(10, 0)
+        self.x += vel*math.cos(self.phi)
+        self.y += -vel*math.sin(self.phi) + 1*self.t
+        # else:
+        #     # self.bullet.move(-10, 0)
+        #     self.x -= 10
 
         self.display()
 
-    def remove(self):
-        pygame.draw.circle(screen, WHITE, self.x, self.y)
+    # def remove(self):
+    #     pygame.draw.circle(screen, WHITE, self.x, self.y)
 
 done = False
 playtime = 0
@@ -125,14 +134,15 @@ while not done:
             sys.exit()   # delete?
         elif event.type == pygame.KEYDOWN:
             if event.key == K_d:
-                    tank1.update()
+                if not tank1.whole_tank.colliderect(tank2.whole_tank):
+                    tank1.update(direction='right' )
                     tank1.display()
                     print("move_right")
 
             elif event.key == K_a:
-                    tank1.update(direction='left')
-                    tank1.display()
-                    print("move_left")
+                tank1.update(direction='left')
+                tank1.display()
+                print("move_left")
 
             elif event.key == K_w:
                tank1.rotate_barrel(direction='ccw')
@@ -143,17 +153,18 @@ while not done:
                print("head down")
 
             elif event.key == K_s:
-                bul1 = Particle(1, tank1.a1, tank1.b1)
+                bul1 = Particle(tank1.phi, tank1.a1, tank1.b1)
                 bullist1.add(bul1)
                 bul1.display()
 
             # tank2 controls
             elif event.key == K_RIGHT:
-                    tank2.update()
-                    tank2.display()
-                    print("2 move_right")
+                tank2.update()
+                tank2.display()
+                print("2 move_right")
 
             elif event.key == K_LEFT:
+                if not tank2.whole_tank.colliderect(tank1.whole_tank):
                     tank2.update(direction='left')
                     tank2.display()
                     print("2 move_left")
@@ -167,7 +178,7 @@ while not done:
                print("2 head down")
 
             elif event.key == K_SPACE:
-                bul2 = Particle(2, tank2.a1, tank2.b1)
+                bul2 = Particle(tank2.phi, tank2.a1, tank2.b1)
                 bullist2.add(bul2)
                 bul2.display()
 
@@ -177,11 +188,11 @@ while not done:
     all_sprites_list.update()
 
     for b in bullist1:
-        if b.x > screen_width or b.y < 0 or b.x < 0 or b.y > ground_level:
+        if b.bullet.x > screen_width or b.bullet.y < 0 or b.bullet.x < 0 or b.bullet.y > ground_level:
             bullist1.remove(b)
 
     for b in bullist2:
-        if b.x > screen_width or b.y < 0 or b.x < 0 or b.y > ground_level:
+        if b.bullet.x > screen_width or b.bullet.y < 0 or b.bullet.x < 0 or b.bullet.y > ground_level:
             bullist2.remove(b)
 
 
