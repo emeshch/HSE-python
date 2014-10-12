@@ -20,27 +20,34 @@ GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 
 
-y = screen_height * 3/4
-l = 50
-# phi = math.pi/9
-pos = 100
+ground_level = screen_height * 3/4
+barrel_length = 50
+pos1 = 50
+pos2 = 250
+phi1 = math.pi/9
+phi2 = math.pi - phi1
+DELTA_PHI = math.pi/18
 
 
 class Tank(pygame.sprite.Sprite):
     '''
     class for manipulating tanks
     '''
-    def __init__(self):
+    def __init__(self, tank_id, pos):
         pygame.sprite.Sprite.__init__(self)
-        self.body = pygame.Rect(pos, y-30, 80, 30)
-        self.phi = math.pi/9
-        self.DELTA_PHI = math.pi/12
+        self.body = pygame.Rect(pos, ground_level-30, 80, 30)
+        self.tank_id = tank_id
+        if self.tank_id == 1:
+            self.phi = phi1
+        else:
+            self.phi = phi2
+        # self.DELTA_PHI = math.pi/18
 
     def rotate_barrel(self, direction='ccw'):
         print self.phi
         if (self.phi >= 0 and direction == 'ccw') or (self.phi <= math.pi and direction == 'cw'):
         # if 0 <= self.phi <= math.pi:
-            self.phi += self.DELTA_PHI if direction == 'ccw' else -self.DELTA_PHI
+            self.phi += DELTA_PHI if direction == 'ccw' else - DELTA_PHI
             if self.phi < 0:
                 self.phi = 0
             if self.phi > math.pi:
@@ -49,8 +56,8 @@ class Tank(pygame.sprite.Sprite):
     def display(self):
         self.a0 = self.body.centerx
         self.b0 = self.body.top
-        self.a1 = self.body.centerx + l*math.cos(self.phi)
-        self.b1 = self.body.top - l*math.sin(self.phi)
+        self.a1 = self.body.centerx + barrel_length*math.cos(self.phi)
+        self.b1 = self.body.top - barrel_length*math.sin(self.phi)
         self.bx, self.by = int(self.a1), int(self.b1)
 
         pygame.draw.rect(screen, GREEN, self.body)
@@ -63,8 +70,9 @@ class Tank(pygame.sprite.Sprite):
 
 
 class Particle(pygame.sprite.Sprite):
-    def __init__(self, x, y):
+    def __init__(self, tank_id, x, y):
         pygame.sprite.Sprite.__init__(self)
+        self.tank_id = tank_id
         self.x = int(x)
         self.y = int(y)
         self.size = 4
@@ -74,15 +82,17 @@ class Particle(pygame.sprite.Sprite):
         self.bullet = pygame.draw.circle(screen, BLACK, (self.x, self.y), self.size)
         # self.bullet = bullet.get_rect()
 
-    # def move(self):
-    #
-    #     #while self.x < screen_width and self.y < y:
-    #         self.x += 10
-    #         self.y -= 10
     def update(self):
-        print 'bullet upd', self.x
-        self.bullet.x += 10
-        self.x += 10
+        # self.tank_id = tank_id
+        print self.tank_id, 'bullet upd', self.x
+
+        if self.tank_id == 1:
+            self.bullet.x += 10
+            self.x += 10
+        else:
+            self.bullet.x -= 10
+            self.x -= 10
+
         self.display()
 
     def remove(self):
@@ -91,11 +101,12 @@ class Particle(pygame.sprite.Sprite):
 done = False
 playtime = 0
 # bullist = []
-bullist = pygame.sprite.Group()
+bullist1 = pygame.sprite.Group()
+bullist2 = pygame.sprite.Group()
 all_sprites_list = pygame.sprite.Group()
 
-tank = Tank()
-
+tank1 = Tank(1, pos1)
+tank2 = Tank(2, pos2)
 
 
 while not done:
@@ -103,8 +114,9 @@ while not done:
     playtime += milliseconds / 1000.0
 
     screen.fill(WHITE)
-    pygame.draw.line(screen, BLACK, (0, y), (screen_width, y), 4)
-    tank.display()
+    pygame.draw.line(screen, BLACK, (0, ground_level), (screen_width, ground_level), 4)
+    tank1.display()
+    tank2.display()
 
     for event in pygame.event.get():
         if event.type == QUIT:
@@ -113,39 +125,64 @@ while not done:
             sys.exit()   # delete?
         elif event.type == pygame.KEYDOWN:
             if event.key == K_d:
-                    tank.update()
-                    tank.display()
+                    tank1.update()
+                    tank1.display()
                     print("move_right")
 
             elif event.key == K_a:
-                    tank.update(direction='left')
-                    tank.display()
+                    tank1.update(direction='left')
+                    tank1.display()
                     print("move_left")
 
             elif event.key == K_w:
-               tank.rotate_barrel(direction='ccw')
+               tank1.rotate_barrel(direction='ccw')
                print("head up")
 
             elif event.key == K_x:
-               tank.rotate_barrel(direction='cw')
+               tank1.rotate_barrel(direction='cw')
                print("head down")
 
             elif event.key == K_s:
-                bul = Particle(tank.a1, tank.b1)
-                bullist.add(bul)
-                bul.display()
-    bullist.update()
+                bul1 = Particle(1, tank1.a1, tank1.b1)
+                bullist1.add(bul1)
+                bul1.display()
 
+            # tank2 controls
+            elif event.key == K_RIGHT:
+                    tank2.update()
+                    tank2.display()
+                    print("2 move_right")
+
+            elif event.key == K_LEFT:
+                    tank2.update(direction='left')
+                    tank2.display()
+                    print("2 move_left")
+
+            elif event.key == K_DOWN:
+               tank2.rotate_barrel(direction='ccw')
+               print("2 head up")
+
+            elif event.key == K_UP:
+               tank2.rotate_barrel(direction='cw')
+               print("2 head down")
+
+            elif event.key == K_SPACE:
+                bul2 = Particle(2, tank2.a1, tank2.b1)
+                bullist2.add(bul2)
+                bul2.display()
+
+    bullist1.update()
+    bullist2.update()
 
     all_sprites_list.update()
 
-    # for bul in bullist:
-    #     bul.move()
-    #     if bul.x > screen_width or bul.y < 0:
-    #         bullist.remove(bul)
-    for b in bullist:
-        if b.x > screen_width or b.y < 0 or b.x < 0 or b.y > y:
-            bullist.remove(b)
+    for b in bullist1:
+        if b.x > screen_width or b.y < 0 or b.x < 0 or b.y > ground_level:
+            bullist1.remove(b)
+
+    for b in bullist2:
+        if b.x > screen_width or b.y < 0 or b.x < 0 or b.y > ground_level:
+            bullist2.remove(b)
 
 
     all_sprites_list.draw(screen)
