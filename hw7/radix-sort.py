@@ -2,20 +2,30 @@ import time
 import random
 
 
-rand_list = random.sample(range(100), 6)
-print("l=", rand_list)
-start_time = time.clock()
+rand_list = random.sample(range(1000), 6)
+rand_list.append(1)
+# print("rand_list ", rand_list)
+str_list = [str(item) for item in rand_list]
+
+start_time = time.clock()   # timer ON
 #list_sorted = [0]*len(l)
 
-#n=10
-modlist = []
-divlist = []
-modlist = [i % 10 for i in rand_list]
-divlist = [i // 10 for i in rand_list]
-print("div= ", divlist, "mod= ", modlist)
 
+# modlist = []
+# divlist = []
+# modlist = [i % 10 for i in rand_list]
+# divlist = [i // 10 for i in rand_list]
+# print("div= ", divlist, "mod= ", modlist)
 
+maxlength = max(len(i) for i in str_list)
+str_list = [item.zfill(maxlength) for item in str_list]
+print(str_list)
 
+n = 1
+modlist = [item[-1] for item in str_list]
+divlist = [item[:-1] for item in str_list]
+print(modlist)
+print(divlist)
 
 def counting_sort(divlist, modlist):
     sortedlist = []
@@ -49,7 +59,7 @@ def counting_sort(divlist, modlist):
     # return sortedlist
     # print("count ", temp)
 
-counting_sort(divlist, modlist)
+# counting_sort(divlist, modlist)
 
 time = time.clock() - start_time
 # print("time: {0:.4f} sec".format(time))
