@@ -1,9 +1,10 @@
+import time
 import random
 
 
 rand_list = random.sample(range(100), 6)
 print("l=", rand_list)
-
+start_time = time.clock()
 #list_sorted = [0]*len(l)
 
 #n=10
@@ -50,6 +51,8 @@ def counting_sort(divlist, modlist):
 
 counting_sort(divlist, modlist)
 
+time = time.clock() - start_time
+# print("time: {0:.4f} sec".format(time))
 #print(list_sorted)
 
 
