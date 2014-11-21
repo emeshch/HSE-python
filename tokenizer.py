@@ -1,4 +1,4 @@
-class Token:
+class TokenManipulator:
     '''
     all the manipulations are carried out here
     '''
@@ -15,9 +15,9 @@ class Token:
         '''
         for token in self.tokens:
             # token = token.replace('\ufeff', '')
-            self.GetThingsDone(token, self.text, pos)
+            self.cut_token(token, self.text, pos)
 
-    def GetThingsDone(self, word, text, pos):
+    def cut_token(self, word, text, pos):
         '''
         extracts the nonletter characters from the tokens,
         cuts the tokens
@@ -39,7 +39,7 @@ class Token:
 
                     token3 = word[word.find(element)+1:]
                     # print('we got', ' ', token1, ' ', token2, ' ', token3)
-                    self.GetThingsDone(token3, text, pos)
+                    self.cut_token(token3, text, pos)
                     break
 
     def locate(self, word, text, p=0):
@@ -56,10 +56,10 @@ class Token:
         return pos
 
 
-input_text = open("TokenizeMe.txt", encoding="utf-8").read()
+input_text = open("textfile.txt", encoding="utf-8").read()
 # input_text = "привет, какое-ниб^удь слово, слово здравствуй!"
 pos = 0
-t = Token(input_text)
+t = TokenManipulator(input_text)
 t.find_tokens()
 
 

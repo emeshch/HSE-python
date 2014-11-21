@@ -2,7 +2,7 @@ import time
 import random
 
 
-rand_list = random.sample(range(1000), 6)
+rand_list = random.sample(range(10000), 6)
 rand_list.append(1)
 # print("rand_list ", rand_list)
 str_list = [str(item) for item in rand_list]
@@ -21,19 +21,21 @@ maxlength = max(len(i) for i in str_list)
 str_list = [item.zfill(maxlength) for item in str_list]
 print(str_list)
 
-n = 1
-modlist = [item[-1] for item in str_list]
-divlist = [item[:-1] for item in str_list]
-print(modlist)
-print(divlist)
+# n = 1
+# modlist = [item[-1] for item in str_list]
+# divlist = [item[:-1] for item in str_list]
+# print(modlist)
+# print(divlist)
 
-def counting_sort(divlist, modlist):
+
+
+def counting_sort(leftlist, modlist, rightlist):
     sortedlist = []
     temp = [0] * 10       # we could take not 10 but max(modlist)+1
     # print("index", [i for i in range(10)])
-    for item in modlist:
+    for num in modlist:
         # print(item)
-        temp[item] += 1
+        temp[num] += 1
     # print("temp ", temp)     # temp[i] now contains the number of elements equal to i
     # print("index", [i for i in range(10)])
 
@@ -59,7 +61,17 @@ def counting_sort(divlist, modlist):
     # return sortedlist
     # print("count ", temp)
 
-# counting_sort(divlist, modlist)
+# for n in range(maxlength-1, 0, -1):
+n = maxlength - 1
+modlist = [item[n] for item in str_list]
+leftlist = [item[:n] for item in str_list]
+rightlist = [item[n+1:] for item in str_list]
+print(n)
+print(modlist)
+print(leftlist)
+print(rightlist)
+counting_sort(leftlist, modlist, rightlist)
+
 
 time = time.clock() - start_time
 # print("time: {0:.4f} sec".format(time))
